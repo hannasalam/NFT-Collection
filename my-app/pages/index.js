@@ -206,7 +206,7 @@ export default function Home() {
     {
       return(
         <div>
-          <div className={styles.description}>Presale hasn't started</div>
+          <div className={styles.description}>{"Presale hasn't started"}</div>
         </div>
       )
     }
@@ -245,7 +245,7 @@ export default function Home() {
           <div>
             <h1 className={styles.title}>Welcome to Crypto Devs!</h1>
             <div className={styles.description}>
-              It's a NFT collection for developers in crypto.
+              {"It's a NFT collection for developers in crypto."}
             </div>
             <div className={styles.description}>
               {tokenIdsMinted}/20 have been added.
