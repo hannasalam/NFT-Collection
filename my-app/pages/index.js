@@ -18,8 +18,8 @@ export default function Home() {
     const provider = await web3modalRef.current.connect();
     const web3Provider = new providers.Web3Provider(provider);
     const {chainId} = await web3Provider.getNetwork();
-    if(chainId!==3){
-      window.alert("Change the new to Ropsten");
+    if(chainId!==4){
+      window.alert("Change the network to Rinkeby");
       throw new Error("Change the network to Rinkeby");
     }
     if(needSigner){
