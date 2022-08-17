@@ -1,4 +1,4 @@
-import { Contract, providers, utils} from "ethers";
+import { Contract, providers, utils, BigNumber} from "ethers";
 import Head from "next/head"
 import React, { useEffect, useRef, useState } from "react";
 import Web3Modal from "web3modal";
@@ -12,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [tokenIdsMinted, setTokenIdsMinted] = useState(0);
+  const [nfts,setNfts] = useState([]);
   const web3modalRef = useRef();
 
   const getProviderOrSigner = async(needSigner = false) => {
@@ -70,6 +71,7 @@ export default function Home() {
       await tx.wait();
       setLoading(false);
       window.alert("You have successfully minted a Crypto Dev!");
+      yourNft();
     }
     catch(err){
       console.error(err);
@@ -88,6 +90,7 @@ export default function Home() {
       await tx.wait();
       setLoading(false);
       window.alert("You have successfully minted a Crypto Dev!");
+      yourNft();
     }
     catch(err){
       console.error(err);
@@ -151,8 +154,24 @@ export default function Home() {
       console.error(err);
     }
   };
+  const yourNft = async ()=>{
+    const provider = await getProviderOrSigner(true);
+      const nftContract = new Contract(NFT_CONTRACT_ADDRESS,abi,provider);
+      const address = await provider.getAddress();
+      const balance = await nftContract.balanceOf(address);
+      const tokenIdArray = [];
+        for(let i=0;i<balance;i++)
+        {
+          let tokenId = await nftContract.tokenOfOwnerByIndex(address, i);
+          let link = "https://testnets.opensea.io/assets/"+NFT_CONTRACT_ADDRESS+"/"+tokenId.toNumber();
+          tokenIdArray.push(link)
+            
+        }
+        setNfts(tokenIdArray)
+    }
 
   useEffect(()=>{
+
     if(!walletConnected){
       web3modalRef.current = new Web3Modal({
         network : "ropsten",
@@ -165,8 +184,9 @@ export default function Home() {
         checkIfPresaleEnded()
       }
       getTokenIdsMinted();
-
-      const presaleEndedInterval = setInterval(async() => {
+      
+      yourNft();
+        const presaleEndedInterval = setInterval(async() => {
         const _presaleStarted = await checkIfPresaleStarted();
         if(_presaleStarted){
           const _presaleEnded = await checkIfPresaleEnded();
@@ -181,6 +201,7 @@ export default function Home() {
       },5*1000);
     }
   },[walletConnected]);
+
   const renderButton = () => {
     if(!walletConnected){
       return(
@@ -233,6 +254,26 @@ export default function Home() {
     }
   }
 
+  const nftsOwned = () =>{
+    if(nfts.length===0){
+      return(
+        <div>
+          <h3>Links to NFTs you own</h3>
+          <div className={styles.description}>You don't own any NFTs. Please mint them!</div>
+        </div>
+      )
+    }
+    else{
+      return(
+         <div>
+              <h3>Links to nfts you own</h3>
+            { nfts.length && nfts.map(nft=>
+                <div key={nft}><a href = {nft} key ={nft} className={styles.description}>{nft}</a> <br/></div>)}
+        </div>
+      )
+    }
+  }
+
 
   return(
     <div>
@@ -250,7 +291,9 @@ export default function Home() {
             <div className={styles.description}>
               {tokenIdsMinted}/20 have been added.
             </div>
+
               {renderButton()}
+              {nftsOwned()}
           </div>
           <div>
             <img className={styles.image} src="./crypto-devs.svg"/>
