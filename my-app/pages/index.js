@@ -259,7 +259,7 @@ export default function Home() {
       return(
         <div>
           <h3>Links to NFTs you own</h3>
-          <div className={styles.description}>You don't own any NFTs. Please mint them!</div>
+          <div className={styles.description}>{"You don't own any NFTs. Please mint them!"}</div>
         </div>
       )
     }
